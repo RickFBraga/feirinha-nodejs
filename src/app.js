@@ -19,22 +19,28 @@ const produtos = [
   },
 ];
 
-app.post("/produtos", (req, res) => {
+app.post("/items", (req, res) => {
   const { name, quantity, type } = req.body;
 
   if (!name || !quantity || !type) {
     return res.status(422).send("Unprocessable Entity");
+  }
+
+  const nameExists = produtos.some((produto) => produto.name === name);
+
+  if (nameExists) {
+    return res.status(409).send("Conflict");
   }
   const produto = { id: produtos.length + 1, name, quantity, type };
   produtos.push(produto);
   res.status(201).send("Created");
 });
 
-app.get("/produtos", (req, res) => {
+app.get("/items", (req, res) => {
   res.send(produtos);
 });
 
-app.get("/produtos/type/:type", (req, res) => {
+app.get("/items/type/:type", (req, res) => {
   const type = req.params.type.toLowerCase();
   const produto = produtos.filter((produto) => {
     return produto.type.toLowerCase() === type;
@@ -42,7 +48,7 @@ app.get("/produtos/type/:type", (req, res) => {
   res.send(produto);
 });
 
-app.get("/produtos/id/:id", (req, res) => {
+app.get("/items/:id", (req, res) => {
   const id = req.params.id;
 
   if (isNaN(id)) {
